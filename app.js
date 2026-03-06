@@ -1,15 +1,24 @@
-const http = require("http");
+const path = require('path');
 
-const server = http.createServer((req, res) => {
-  console.log(req.headers);
-  console.log(req.url);
-  console.log(req.method);
+const express = require('express');
+const bodyParser = require('body-parser');
 
-  res.setHeader("Content-Type", "text/html");
-  res.write("<html>");
-  res.write("<head><title>First Page</title></head>");
-  res.write("<body><h1>Hello from server</h1></body>");
-  res.write("</html>");
-  res.end();
-});
-server.listen(3000);
+const errorController = require('./controllers/error');
+
+const app = express();
+
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+
+app.use(errorController.get404);
+
+app.listen(3000);
